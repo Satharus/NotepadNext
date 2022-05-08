@@ -275,7 +275,7 @@ MainWindow::MainWindow(NotepadNextApplication *app) :
 
         QInputDialog d = QInputDialog(this);
         Qt::WindowFlags flags = d.windowFlags() & ~Qt::WindowContextHelpButtonHint;
-        int lineToGoTo = d.getInt(this, "Go to line", QString("Line Number (1 - %1)").arg(maxLine), currentLine, 1, maxLine, 1, &ok, flags);
+        int lineToGoTo = d.getInt(this, tr("Go to line"), tr("Line Number (1 - %1)").arg(maxLine), currentLine, 1, maxLine, 1, &ok, flags);
 
         if (ok) {
             editor->ensureVisible(lineToGoTo - 1);
@@ -417,7 +417,7 @@ MainWindow::MainWindow(NotepadNextApplication *app) :
     recorder = new MacroRecorder(this);
     connect(ui->actionMacroRecording, &QAction::triggered, [=](bool b) {
         if (b) {
-            ui->actionMacroRecording->setText("Stop Recording");
+            ui->actionMacroRecording->setText(tr("Stop Recording"));
             recorder->startRecording(dockedEditor->getCurrentEditor());
 
             // A macro is being recorded so disable some macro options
@@ -426,7 +426,7 @@ MainWindow::MainWindow(NotepadNextApplication *app) :
             ui->actionSaveCurrentRecordedMacro->setEnabled(false);
         }
         else {
-            ui->actionMacroRecording->setText("Start Recording");
+            ui->actionMacroRecording->setText(tr("Start Recording"));
             Macro *m = recorder->stopRecording();
 
             if (m->size() > 0) {
@@ -511,9 +511,9 @@ MainWindow::MainWindow(NotepadNextApplication *app) :
 
     ui->actionAboutNotepadNext->setShortcut(QKeySequence::HelpContents);
     connect(ui->actionAboutNotepadNext, &QAction::triggered, [=]() {
-        QMessageBox::about(this, "About Notepad Next",
-                            QString("<h3>Notepad Next v%1</h3>"
-                                    "<p>%2</p>"
+        QMessageBox::about(this, QString(),
+                            QStringLiteral("<h3>%1 v%2</h3>"
+                                    "<p>%3</p>"
                                     "<p>This program does stuff.</p>"
                                     R"(<p>This program is free software: you can redistribute it and/or modify
                                     it under the terms of the GNU General Public License as published by
@@ -525,7 +525,7 @@ MainWindow::MainWindow(NotepadNextApplication *app) :
                                     GNU General Public License for more details.</p>
                                     <p>You should have received a copy of the GNU General Public License
                                     along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</p>)")
-                                .arg(APP_VERSION, QStringLiteral(APP_COPYRIGHT).toHtmlEscaped()));
+                                .arg(QApplication::applicationDisplayName(), APP_VERSION, QStringLiteral(APP_COPYRIGHT).toHtmlEscaped()));
     });
 
     QAction *separator = ui->menuHelp->insertSeparator(ui->actionCheckForUpdates);
@@ -633,7 +633,7 @@ void MainWindow::newFile()
 
     static int count = 1;
 
-    app->getEditorManager()->createEmptyEditor(QString("New %1").arg(count++));
+    app->getEditorManager()->createEmptyEditor(tr("New %1").arg(count++));
 }
 
 // One unedited, new blank document
@@ -667,7 +667,7 @@ void MainWindow::openFileList(const QStringList &fileNames)
             QFileInfo fileInfo(filePath);
 
             if (!fileInfo.isFile()) {
-                auto reply = QMessageBox::question(this, "Create File", QString("<b>%1</b> does not exist. Do you want to create it?").arg(filePath));
+                auto reply = QMessageBox::question(this, tr("Create File"), tr("<b>%1</b> does not exist. Do you want to create it?").arg(filePath));
 
                 if (reply == QMessageBox::Yes) {
                     editor = app->getEditorManager()->createEditorFromFile(filePath);
@@ -716,8 +716,8 @@ bool MainWindow::checkEditorsBeforeClose(const QVector<ScintillaNext *> &editors
             dockedEditor->switchToEditor(editor);
 
             // Ask the user what to do
-            QString message = QString("Save file <b>%1</b>?").arg(editor->getName());
-            auto reply = QMessageBox::question(this, "Save File", message, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+            QString message = tr("Save file <b>%1</b>?").arg(editor->getName());
+            auto reply = QMessageBox::question(this, tr("Save File"), message, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 
             if (reply == QMessageBox::Cancel) {
                 // Stop checking and let the caller know
@@ -770,7 +770,7 @@ void MainWindow::openFolderAsWorkspaceDialog()
         dialogDir = editor->getPath();
     }
 
-    QString dir = QFileDialog::getExistingDirectory(this, "Open Folder as Workspace", dialogDir, QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Folder as Workspace"), dialogDir, QFileDialog::ShowDirsOnly);
 
     FolderAsWorkspaceDock *fawDock = findChild<FolderAsWorkspaceDock *>();
     fawDock->setRootPath(dir);
@@ -786,7 +786,7 @@ void MainWindow::reloadFile()
     }
 
     const QString filePath = editor->getFilePath();
-    auto reply = QMessageBox::question(this, "Reload File", QString("Are you sure you want to reload <b>%1</b>? Any unsaved changes will be lost.").arg(filePath));
+    auto reply = QMessageBox::question(this, tr("Reload File"), tr("Are you sure you want to reload <b>%1</b>? Any unsaved changes will be lost.").arg(filePath));
 
     if (reply == QMessageBox::Yes) {
         editor->reload();
@@ -812,8 +812,8 @@ void MainWindow::closeFile(ScintillaNext *editor)
         // The user needs be asked what to do about this file, so switch to it
         dockedEditor->switchToEditor(editor);
 
-        QString message = QString("Save file <b>%1</b>?").arg(editor->getName());
-        auto reply = QMessageBox::question(this, "Save File", message, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+        QString message = tr("Save file <b>%1</b>?").arg(editor->getName());
+        auto reply = QMessageBox::question(this, tr("Save File"), message, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 
         if (reply == QMessageBox::Cancel) {
             return;
@@ -975,7 +975,7 @@ void MainWindow::saveCopyAsDialog()
         dialogDir = editor->getFilePath();
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, "Save a Copy As", dialogDir, filter, Q_NULLPTR);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save a Copy As"), dialogDir, filter, Q_NULLPTR);
 
     saveCopyAs(fileName);
 }
@@ -999,7 +999,7 @@ void MainWindow::renameFile()
 
     Q_ASSERT(editor->isFile());
 
-    QString fileName = QFileDialog::getSaveFileName(this, "Rename", editor->getFilePath());
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Rename"), editor->getFilePath());
 
     if (fileName.size() == 0) {
         return;
@@ -1025,7 +1025,7 @@ void MainWindow::moveFileToTrash(ScintillaNext *editor)
     Q_ASSERT(editor->isFile());
 
     const QString filePath = editor->getFilePath();
-    auto reply = QMessageBox::question(this, "Delete File", QString("Are you sure you want to move <b>%1</b> to the trash?").arg(filePath));;
+    auto reply = QMessageBox::question(this, tr("Delete File"), tr("Are you sure you want to move <b>%1</b> to the trash?").arg(filePath));;
 
     if (reply == QMessageBox::Yes) {
         if (editor->moveToTrash()) {
@@ -1035,7 +1035,7 @@ void MainWindow::moveFileToTrash(ScintillaNext *editor)
             app->getRecentFilesListManager()->removeFile(editor->getFilePath());
         }
         else {
-            QMessageBox::warning(this, "Error Deleting File",  QString("Something went wrong deleting <b>%1</b>?").arg(filePath));
+            QMessageBox::warning(this, tr("Error Deleting File"),  tr("Something went wrong deleting <b>%1</b>?").arg(filePath));
         }
     }
 }
@@ -1256,7 +1256,7 @@ void MainWindow::activateEditor(ScintillaNext *editor)
 void MainWindow::setLanguage(ScintillaNext *editor, const QString &languageName)
 {
     qInfo(Q_FUNC_INFO);
-    qInfo("%s", qUtf8Printable("Language Name: " + languageName));
+    qInfo("Language Name: %s", qUtf8Printable(languageName));
 
     app->setEditorLanguage(editor, languageName);
 }
@@ -1347,9 +1347,6 @@ void MainWindow::restoreSettings()
 
     QSettings settings;
 
-    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
-    restoreState(settings.value("MainWindow/windowState").toByteArray());
-
     app->getSettings()->setShowMenuBar(settings.value("Gui/ShowMenuBar", true).toBool());
     app->getSettings()->setShowToolBar(settings.value("Gui/ShowToolBar", true).toBool());
     app->getSettings()->setShowStatusBar(settings.value("Gui/ShowStatusBar", true).toBool());
@@ -1360,6 +1357,15 @@ void MainWindow::restoreSettings()
 
     ui->actionWordWrap->setChecked(settings.value("Editor/WordWrap", false).toBool());
     ui->actionShowIndentGuide->setChecked(settings.value("Editor/IndentGuide", true).toBool());
+}
+
+
+void MainWindow::restoreWindowState()
+{
+    QSettings settings;
+
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+    restoreState(settings.value("MainWindow/windowState").toByteArray());
 
     FolderAsWorkspaceDock *fawDock = findChild<FolderAsWorkspaceDock *>();
     fawDock->setRootPath(settings.value("FolderAsWorkspace/RootPath").toString());
@@ -1444,7 +1450,7 @@ void MainWindow::checkForUpdatesFinished(QString url)
 {
 #ifdef Q_OS_WIN
     if (!QSimpleUpdater::getInstance()->getUpdateAvailable(url)) {
-        QMessageBox::information(this, "Notepad Next", "No updates are availale at this time.");
+        QMessageBox::information(this, QString(), tr("No updates are availale at this time."));
     }
 #endif
 }

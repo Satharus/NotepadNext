@@ -36,6 +36,7 @@
 #include <QCommandLineParser>
 #include <QSettings>
 
+
 const SingleApplication::Options opts = SingleApplication::ExcludeAppPath | SingleApplication::ExcludeAppVersion | SingleApplication::SecondaryNotification;
 
 template <>
@@ -56,6 +57,7 @@ struct luabridge::Stack <QString const&>
 NotepadNextApplication::NotepadNextApplication(int &argc, char **argv)
     : SingleApplication(argc, argv, true, opts)
 {
+    setWindowIcon(QIcon(QStringLiteral(":/icons/NotepadNext.png")));
 }
 
 bool NotepadNextApplication::init()
@@ -177,6 +179,7 @@ bool NotepadNextApplication::init()
 
     // Everything should be ready at this point
 
+    windows.first()->restoreWindowState();
     windows.first()->show();
 
     return true;
@@ -269,6 +272,19 @@ QString NotepadNextApplication::detectLanguageFromExtension(const QString &exten
     end
     return "Text"
     )").arg(extension).toLatin1().constData());
+}
+
+void NotepadNextApplication::loadSystemDefaultTranslation()
+{
+    QLocale locale =  QLocale::system();
+
+    // look up e.g. i18n/NotepadNext.en.qm
+    if (translator.load(locale, QApplication::applicationName(), QString("."), QString("i18n"))) {
+        installTranslator(&translator);
+        qInfo("Loaded translation for %s", qUtf8Printable(locale.name()));
+    } else {
+        qInfo("Translation not found for %s", qUtf8Printable(locale.name()));
+    }
 }
 
 void NotepadNextApplication::applyArguments(const QStringList &args)

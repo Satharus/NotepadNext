@@ -34,6 +34,7 @@ include(../lua.pri)
 include(../ads.pri)
 include(../editorconfig-core-qt/EditorConfig.pri)
 win32:include(../QSimpleUpdater/QSimpleUpdater.pri)
+include(../i18n.pri)
 
 # Set variables for output executable
 VERSION = $$APP_VERSION
@@ -45,7 +46,7 @@ win32 {
     QMAKE_TARGET_DESCRIPTION = Notepad Next
     QMAKE_TARGET_COPYRIGHT = $$APP_COPYRIGHT
     QMAKE_TARGET_PRODUCT = Notepad Next
-    RC_ICONS = ../../icon/nn.ico
+    RC_ICONS = ../../icon/NotepadNext.ico
 
     COPIES += openssl
     openssl.files = $$files(../../deploy/windows/*.dll)
@@ -55,7 +56,6 @@ win32 {
 COPIES += license
 license.files = ../../LICENSE
 license.path = $$OUT_PWD
-
 
 SOURCES += \
     ColorPickerDelegate.cpp \
@@ -197,14 +197,18 @@ RCC_DIR = build/qrc
 UI_DIR = build/ui
 
 unix {
-    target.path = /usr/bin
+    isEmpty(PREFIX) {
+        PREFIX = /usr
+    }
+
+    target.path = $$PREFIX/bin
     INSTALLS += target
 
-    desktopfile.path = /usr/share/applications/
+    desktopfile.path = $$PREFIX/share/applications/
     desktopfile.files += ../../deploy/linux/NotepadNext.desktop
     INSTALLS += desktopfile
 
-    iconscalable.path = /usr/share/icons/hicolor/scalable/mimetypes/
+    iconscalable.path = $$PREFIX/share/icons/hicolor/scalable/mimetypes/
     iconscalable.files = ../../icon/NotepadNext.svg
     INSTALLS += iconscalable
 }

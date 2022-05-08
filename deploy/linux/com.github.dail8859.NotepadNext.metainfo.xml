@@ -3,6 +3,7 @@
 <!-- https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html -->
 <component type="desktop-application">
     <id>com.github.dail8859.NotepadNext</id>
+    <developer_name>Justin Dailey</developer_name>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0</project_license>
     <content_rating type="oars-1.1" />
@@ -25,6 +26,7 @@
 
     <launchable type="desktop-id">com.github.dail8859.NotepadNext.desktop</launchable>
     <releases>
+        <release version="v0.5.1" date="2022-04-30" />
         <release version="v0.5" date="2022-04-17" />
         <release version="v0.4.9" date="2022-03-18" />
     </releases>
